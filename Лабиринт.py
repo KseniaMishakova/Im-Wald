@@ -100,7 +100,7 @@ def start_screen():
         clock.tick(FPS)
 
 
-tile_images = {'wall': load_image('tree.png'), 'empty': load_image('grass.gif'), 'trace': load_image('trace.png')}
+tile_images = {'wall': load_image('tree.png'), 'empty': load_image('grass.png'), 'trace': load_image('trace.png')}
 player_image = load_image('mario.png')
 
 tile_width = tile_height = 100
