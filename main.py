@@ -94,7 +94,7 @@ def terminate2():
     pygame.quit()
     sys.exit
 
-
+# Пояснение
 def start_screen():
     intro_text = ["В Лесу...",
                   "",
