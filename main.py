@@ -2,7 +2,7 @@ import pygame
 import os
 import sys
 
-
+# Загрузка картинки
 def load_image2(name, color_key=None):
     fullname = os.path.join('data', name)
     try:
@@ -23,6 +23,7 @@ screen_size = (550, 550)
 screen = pygame.display.set_mode(screen_size)
 FPS = 60
 
+# Обозначение
 tile_images = {
     'wall': load_image2('box.png'),
     'empty': load_image2('grass.png'),
@@ -34,7 +35,7 @@ player_image = load_image2('dude_4.png')
 tile_width = tile_height = 50
 
 
-class ScreenFrame2(pygame.sprite.Sprite):
+class ScreenFrame2(pygame.sprite.Sprite):        # Размер окна
     def __init__(self):
         super().__init__()
         self.rect = (0, 0, 500, 500)
@@ -122,7 +123,7 @@ def start_screen():
         pygame.display.flip()
         clock.tick(FPS)
 
-
+# Пояснение 2
 def start_screen2():
     intro_text = ["В игре есть две небольшие игры.",
                   "Для того чтобы найти брата нужно их пройти.",
@@ -151,7 +152,7 @@ def start_screen2():
         pygame.display.flip()
         clock.tick(FPS)
 
-
+# Пояснение 3
 def start_screen3():
     intro_text = ["История...",
                   "",
@@ -184,7 +185,7 @@ def start_screen3():
         pygame.display.flip()
         clock.tick(FPS)
 
-
+# Пояснение 4
 def start_screen4():
     intro_text = ["Перед вами кнопки",
                   "При нажатии кнопки лежащие против неё кнопки",
@@ -215,7 +216,7 @@ def start_screen4():
         pygame.display.flip()
         clock.tick(FPS)
 
-
+# Пояснение 5
 def start_screen5():
     intro_text = ["История...",
                   "",
@@ -245,7 +246,7 @@ def start_screen5():
         pygame.display.flip()
         clock.tick(FPS)
 
-
+# Пояснение 6
 def start_screen6():
     intro_text = ["История...",
                   "",
@@ -274,7 +275,7 @@ def start_screen6():
         pygame.display.flip()
         clock.tick(FPS)
 
-
+# Пояснение 7
 def start_screen7():
     intro_text = ["Вы в лабиринте",
                   "Вы не можете ходить сквозь деревья.",
@@ -304,7 +305,7 @@ def start_screen7():
         pygame.display.flip()
         clock.tick(FPS)
 
-
+# Пояснение 8
 def start_screen8():
     intro_text = ["История...",
                   "",
@@ -372,6 +373,7 @@ def load_level2(filename):
     return list(map(lambda x: list(x.ljust(max_width, '.')), level_map))
 
 
+# Генерация уровня
 def generate_level(level):
     new_player, x, y = None, None, None
     for y in range(len(level)):
@@ -404,6 +406,7 @@ b4 = 1
 b5 = 1
 
 
+# Передвижение героя
 def move2(hero, movement):
     global b1, b2, b3, b4, b5
     x, y = hero.pos
@@ -747,6 +750,7 @@ def move2(hero, movement):
         Tile2('empty', 10, 5)
 
 
+# Анимация героя
 class AnimatedSprite2(pygame.sprite.Sprite):
     def __init__(self, sheet, columns, rows, pos_x, pos_y):
         super().__init__(all_sprites)
@@ -863,12 +867,12 @@ all_sprites = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 
-
+# Загрузка картинок
 def load_image(filename):
     filename = 'data/' + filename
     return pygame.image.load(filename).convert_alpha()
 
-
+# Загрузка уровня
 def load_level(filename):
     filename = "data/" + filename
     # читаем уровень, убирая символы перевода строки
@@ -881,7 +885,7 @@ def load_level(filename):
     # дополняем каждую строку пустыми клетками ('.')
     return list(map(lambda x: x.ljust(max_width, '.'), level_map))
 
-
+# Генерация уровня
 def generate_level(level):
     for y in range(len(level)):
         for x in range(len(level[y])):
@@ -902,7 +906,7 @@ def terminate():
     pygame.quit()
     sys.exit()
 
-
+# Пояснение
 def start_screen():
     intro_text = ["Вы в лабиринте",
                   "Найдите своего любимого брата."]
@@ -949,7 +953,7 @@ class Player(pygame.sprite.Sprite):
         self.image = player_image
         self.rect = self.image.get_rect().move(tile_width * pos_x + 15, tile_height * pos_y + 5)
 
-
+# Анимация
 class AnimatedSprite(pygame.sprite.Sprite):
     def __init__(self, sheet, columns, rows, pos_x, pos_y):
         super().__init__(all_sprites)
@@ -979,7 +983,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
         self.rect = self.image.get_rect().move(
             tile_width * self.pos[0] + 15, tile_height * self.pos[1] + 5)
 
-
+# Камера
 class Camera:
     # зададим начальный сдвиг камеры и размер поля для возможности реализации циклического сдвига
     def __init__(self, field_size):
