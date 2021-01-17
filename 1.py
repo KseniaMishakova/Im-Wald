@@ -12,7 +12,7 @@ def load_image2(name, color_key=None):
         raise SystemExit(message)
     image = image.convert_alpha()
     if color_key is not None:
-        if color_key is -1:
+        if color_key == -1:
             color_key = image.get_at((0, 0))
         image.set_colorkey(color_key)
     return image
@@ -67,6 +67,23 @@ class Tile2(Sprite2):
         self.image = tile_images[tile_type]
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
+
+
+class MagicButton(Sprite2):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(sprite_group)
+        self.pos = (pos_x, pos_y)
+        self.enabled = False
+        self.frames = []
+        self.frames.append(tile_images['button'])
+        self.frames.append(tile_images['button_down'])
+        self.image = self.frames[int(self.enabled)]
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x, tile_height * pos_y)
+
+    def switch(self):
+        self.enabled = not self.enabled
+        self.image = self.frames[int(self.enabled)]
 
 
 class Player2(Sprite2):
@@ -139,16 +156,6 @@ def generate_level(level):
                 Tile2('empty', x, y)
             elif level[y][x] == '#':
                 Tile2('wall', x, y)
-            elif level[y][x] == '1':
-                Tile2('button', x, y)
-            elif level[y][x] == '2':
-                Tile2('button', x, y)
-            elif level[y][x] == '3':
-                Tile2('button', x, y)
-            elif level[y][x] == '4':
-                Tile2('button', x, y)
-            elif level[y][x] == '5':
-                Tile2('button', x, y)
             elif level[y][x] == '@':
                 Tile2('empty', x, y)
                 new_player = AnimatedSprite2(load_image2("dude_4.png"), 4, 1, x, y)
@@ -156,353 +163,144 @@ def generate_level(level):
     return new_player, x, y
 
 
-b1 = 1
-b2 = 1
-b3 = 1
-b4 = 1
-b5 = 1
+def generate_buttons(level):
+    mb1, mb2, mb3, mb4, mb5 = None, None, None, None, None
+    for y in range(len(level)):
+        for x in range(len(level[y])):
+            if level[y][x] == '1':
+                mb1 = MagicButton(x, y)
+            elif level[y][x] == '2':
+                mb2 = MagicButton(x, y)
+            elif level[y][x] == '3':
+                mb3 = MagicButton(x, y)
+            elif level[y][x] == '4':
+                mb4 = MagicButton(x, y)
+            elif level[y][x] == '5':
+                mb5 = MagicButton(x, y)
+    return mb1, mb2, mb3, mb4, mb5
 
 
 def move2(hero, movement):
-    global b1, b2, b3, b4, b5
+
+    global mb1, mb2, mb3, mb4, mb5
     x, y = hero.pos
     if movement == "up":
         if y > 0 and (level_map[y - 1][x] == "." or level_map[y - 1][x] == "1" or level_map[y - 1][x] == "2" or
                       level_map[y - 1][x] == "3" or level_map[y - 1][x] == "4" or level_map[y - 1][x] == "5"):
             hero.move(x, y - 1)
             if level_map[y - 1][x] == '1':
-                if b1 == 1:
-                    Tile2('button_down', x, y - 1)
-                    b1 = 0
-                    if b3 == 1:
-                        Tile2('button_down', 8, 8)
-                        b3 = 0
-                    else:
-                        Tile2('button', 8, 8)
-                        b3 = 1
-                    if b4 == 1:
-                        Tile2('button_down', 2, 8)
-                        b4 = 0
-                    else:
-                        Tile2('button', 2, 8)
-                        b4 = 1
+                if not mb1.enabled:
+                    mb1.switch()
+                    mb3.switch()
+                    mb4.switch()
             elif level_map[y - 1][x] == '2':
-                if b2 == 1:
-                    Tile2('button_down', x, y - 1)
-                    b2 = 0
-                    if b5 == 1:
-                        Tile2('button_down', 2, 4)
-                        b5 = 0
-                    else:
-                        Tile2('button', 2, 4)
-                        b5 = 1
-                    if b4 == 1:
-                        Tile2('button_down', 2, 8)
-                        b4 = 0
-                    else:
-                        Tile2('button', 2, 8)
-                        b4 = 1
+                if not mb2.enabled:
+                    mb2.switch()
+                    mb4.switch()
+                    mb5.switch()
             elif level_map[y - 1][x] == '3':
-                if b3 == 1:
-                    Tile2('button_down', x, y - 1)
-                    b3 = 0
-                    if b5 == 1:
-                        Tile2('button_down', 2, 4)
-                        b5 = 0
-                    else:
-                        Tile2('button', 2, 4)
-                        b5 = 1
-                    if b1 == 1:
-                        Tile2('button_down', 5, 2)
-                        b1 = 0
-                    else:
-                        Tile2('button', 5, 2)
-                        b1 = 1
+                if not mb3.enabled:
+                    mb1.switch()
+                    mb3.switch()
+                    mb5.switch()
             elif level_map[y - 1][x] == '4':
-                if b4 == 1:
-                    Tile2('button_down', x, y - 1)
-                    b4 = 0
-                    if b1 == 1:
-                        Tile2('button_down', 5, 2)
-                        b1 = 0
-                    else:
-                        Tile2('button', 5, 2)
-                        b1 = 1
-                    if b2 == 1:
-                        Tile2('button_down', 8, 4)
-                        b2 = 0
-                    else:
-                        Tile2('button', 8, 4)
-                        b2 = 1
+                if not mb4.enabled:
+                    mb4.switch()
+                    mb1.switch()
+                    mb2.switch()
             elif level_map[y - 1][x] == '5':
-                if b5 == 1:
-                    Tile2('button_down', x, y - 1)
-                    b5 = 0
-                    if b2 == 1:
-                        Tile2('button_down', 8, 4)
-                        b2 = 0
-                    else:
-                        Tile2('button', 8, 4)
-                        b2 = 1
-                    if b3 == 1:
-                        Tile2('button_down', 8, 8)
-                        b3 = 0
-                    else:
-                        Tile2('button', 8, 8)
-                        b3 = 1
+                if not mb5.enabled:
+                    mb5.switch()
+                    mb2.switch()
+                    mb3.switch()
     elif movement == "down":
         if y < max_y - 1 and (level_map[y + 1][x] == "." or level_map[y + 1][x] == "1" or level_map[y + 1][x] == "2" or
                               level_map[y + 1][x] == "3" or level_map[y + 1][x] == "4" or level_map[y + 1][x] == "5"):
             hero.move(x, y + 1)
             if level_map[y + 1][x] == '1':
-                if b1 == 1:
-                    Tile2('button_down', x, y + 1)
-                    b1 = 0
-                    if b3 == 1:
-                        Tile2('button_down', 8, 8)
-                        b3 = 0
-                    else:
-                        Tile2('button', 8, 8)
-                        b3 = 1
-                    if b4 == 1:
-                        Tile2('button_down', 2, 8)
-                        b4 = 0
-                    else:
-                        Tile2('button', 2, 8)
-                        b4 = 1
+                if not mb1.enabled:
+                    mb1.switch()
+                    mb3.switch()
+                    mb4.switch()
             elif level_map[y + 1][x] == '2':
-                if b2 == 1:
-                    Tile2('button_down', x, y + 1)
-                    b2 = 0
-                    if b5 == 1:
-                        Tile2('button_down', 2, 4)
-                        b5 = 0
-                    else:
-                        Tile2('button', 2, 4)
-                        b5 = 1
-                    if b4 == 1:
-                        Tile2('button_down', 2, 8)
-                        b4 = 0
-                    else:
-                        Tile2('button', 2, 8)
-                        b4 = 1
+                if not mb2.enabled:
+                    mb2.switch()
+                    mb4.switch()
+                    mb5.switch()
             elif level_map[y + 1][x] == '3':
-                if b3 == 1:
-                    Tile2('button_down', x, y + 1)
-                    b3 = 0
-                    if b5 == 1:
-                        Tile2('button_down', 2, 4)
-                        b5 = 0
-                    else:
-                        Tile2('button', 2, 4)
-                        b5 = 1
-                    if b1 == 1:
-                        Tile2('button_down', 5, 2)
-                        b1 = 0
-                    else:
-                        Tile2('button', 5, 2)
-                        b1 = 1
+                if not mb3.enabled:
+                    mb1.switch()
+                    mb3.switch()
+                    mb5.switch()
             elif level_map[y + 1][x] == '4':
-                if b4 == 1:
-                    Tile2('button_down', x, y + 1)
-                    b4 = 0
-                    if b1 == 1:
-                        Tile2('button_down', 5, 2)
-                        b1 = 0
-                    else:
-                        Tile2('button', 5, 2)
-                        b1 = 1
-                    if b2 == 1:
-                        Tile2('button_down', 8, 4)
-                        b2 = 0
-                    else:
-                        Tile2('button', 8, 4)
-                        b2 = 1
+                if not mb4.enabled:
+                    mb4.switch()
+                    mb1.switch()
+                    mb2.switch()
             elif level_map[y + 1][x] == '5':
-                if b5 == 1:
-                    Tile2('button_down', x, y + 1)
-                    b5 = 0
-                    if b2 == 1:
-                        Tile2('button_down', 8, 4)
-                        b2 = 0
-                    else:
-                        Tile2('button', 8, 4)
-                        b2 = 1
-                    if b3 == 1:
-                        Tile2('button_down', 8, 8)
-                        b3 = 0
-                    else:
-                        Tile2('button', 8, 8)
-                        b3 = 1
+                if not mb5.enabled:
+                    mb5.switch()
+                    mb2.switch()
+                    mb3.switch()
     elif movement == "left":
         if x > 0 and (level_map[y][x - 1] == "." or level_map[y][x - 1] == "1" or level_map[y][x - 1] == "2" or
                       level_map[y][x - 1] == "3" or level_map[y][x - 1] == "4" or level_map[y][x - 1] == "5"):
             hero.move(x - 1, y)
             if level_map[y][x - 1] == '1':
-                if b1 == 1:
-                    Tile2('button_down', x - 1, y)
-                    b1 = 0
-                    if b3 == 1:
-                        Tile2('button_down', 8, 8)
-                        b3 = 0
-                    else:
-                        Tile2('button', 8, 8)
-                        b3 = 1
-                    if b4 == 1:
-                        Tile2('button_down', 2, 8)
-                        b4 = 0
-                    else:
-                        Tile2('button', 2, 8)
-                        b4 = 1
+                if not mb1.enabled:
+                    mb1.switch()
+                    mb3.switch()
+                    mb4.switch()
             elif level_map[y][x - 1] == '2':
-                if b2 == 1:
-                    Tile2('button_down', x - 1, y)
-                    b2 = 0
-                    if b5 == 1:
-                        Tile2('button_down', 2, 4)
-                        b5 = 0
-                    else:
-                        Tile2('button', 2, 4)
-                        b5 = 1
-                    if b4 == 1:
-                        Tile2('button_down', 2, 8)
-                        b4 = 0
-                    else:
-                        Tile2('button', 2, 8)
-                        b4 = 1
+                if not mb2.enabled:
+                    mb2.switch()
+                    mb4.switch()
+                    mb5.switch()
             elif level_map[y][x - 1] == '3':
-                if b3 == 1:
-                    Tile2('button_down', x - 1, y)
-                    b3 = 0
-                    if b5 == 1:
-                        Tile2('button_down', 2, 4)
-                        b5 = 0
-                    else:
-                        Tile2('button', 2, 4)
-                        b5 = 1
-                    if b1 == 1:
-                        Tile2('button_down', 5, 2)
-                        b1 = 0
-                    else:
-                        Tile2('button', 5, 2)
-                        b1 = 1
+                if not mb3.enabled:
+                    mb1.switch()
+                    mb3.switch()
+                    mb5.switch()
             elif level_map[y][x - 1] == '4':
-                if b4 == 1:
-                    Tile2('button_down', x - 1, y)
-                    b4 = 0
-                    if b1 == 1:
-                        Tile2('button_down', 5, 2)
-                        b1 = 0
-                    else:
-                        Tile2('button', 5, 2)
-                        b1 = 1
-                    if b2 == 1:
-                        Tile2('button_down', 8, 4)
-                        b2 = 0
-                    else:
-                        Tile2('button', 8, 4)
-                        b2 = 1
+                if not mb4.enabled:
+                    mb4.switch()
+                    mb1.switch()
+                    mb2.switch()
             elif level_map[y][x - 1] == '5':
-                if b5 == 1:
-                    Tile2('button_down', x - 1, y)
-                    b5 = 0
-                    if b2 == 1:
-                        Tile2('button_down', 8, 4)
-                        b2 = 0
-                    else:
-                        Tile2('button', 8, 4)
-                        b2 = 1
-                    if b3 == 1:
-                        Tile2('button_down', 8, 8)
-                        b3 = 0
-                    else:
-                        Tile2('button', 8, 8)
-                        b3 = 1
+                if not mb5.enabled:
+                    mb5.switch()
+                    mb2.switch()
+                    mb3.switch()
     elif movement == "right":
         if x < max_x - 1 and (level_map[y][x + 1] == "." or level_map[y][x + 1] == "1" or level_map[y][x + 1] == "2" or
                               level_map[y][x + 1] == "3" or level_map[y][x + 1] == "4" or level_map[y][x + 1] == "5"):
             hero.move(x + 1, y)
             if level_map[y][x + 1] == '1':
-                if b1 == 1:
-                    Tile2('button_down', x + 1, y)
-                    b1 = 0
-                    if b3 == 1:
-                        Tile2('button_down', 8, 8)
-                        b3 = 0
-                    else:
-                        Tile2('button', 8, 8)
-                        b3 = 1
-                    if b4 == 1:
-                        Tile2('button_down', 2, 8)
-                        b4 = 0
-                    else:
-                        Tile2('button', 2, 8)
-                        b4 = 1
+                if not mb1.enabled:
+                    mb1.switch()
+                    mb3.switch()
+                    mb4.switch()
             elif level_map[y][x + 1] == '2':
-                if b2 == 1:
-                    Tile2('button_down', x + 1, y)
-                    b2 = 0
-                    if b5 == 1:
-                        Tile2('button_down', 2, 4)
-                        b5 = 0
-                    else:
-                        Tile2('button', 2, 4)
-                        b5 = 1
-                    if b4 == 1:
-                        Tile2('button_down', 2, 8)
-                        b4 = 0
-                    else:
-                        Tile2('button', 2, 8)
-                        b4 = 1
+                if not mb2.enabled:
+                    mb2.switch()
+                    mb4.switch()
+                    mb5.switch()
             elif level_map[y][x + 1] == '3':
-                if b3 == 1:
-                    Tile2('button_down', x + 1, y)
-                    b3 = 0
-                    if b5 == 1:
-                        Tile2('button_down', 2, 4)
-                        b5 = 0
-                    else:
-                        Tile2('button', 2, 4)
-                        b5 = 1
-                    if b1 == 1:
-                        Tile2('button_down', 5, 2)
-                        b1 = 0
-                    else:
-                        Tile2('button', 5, 2)
-                        b1 = 1
+                if not mb3.enabled:
+                    mb1.switch()
+                    mb3.switch()
+                    mb5.switch()
             elif level_map[y][x + 1] == '4':
-                if b4 == 1:
-                    Tile2('button_down', x + 1, y)
-                    b4 = 0
-                    if b1 == 1:
-                        Tile2('button_down', 5, 2)
-                        b1 = 0
-                    else:
-                        Tile2('button', 5, 2)
-                        b1 = 1
-                    if b2 == 1:
-                        Tile2('button_down', 8, 4)
-                        b2 = 0
-                    else:
-                        Tile2('button', 8, 4)
-                        b2 = 1
+                if not mb4.enabled:
+                    mb4.switch()
+                    mb1.switch()
+                    mb2.switch()
             elif level_map[y][x + 1] == '5':
-                if b5 == 1:
-                    Tile2('button_down', x + 1, y)
-                    b5 = 0
-                    if b2 == 1:
-                        Tile2('button_down', 8, 4)
-                        b2 = 0
-                    else:
-                        Tile2('button', 8, 4)
-                        b2 = 1
-                    if b3 == 1:
-                        Tile2('button_down', 8, 8)
-                        b3 = 0
-                    else:
-                        Tile2('button', 8, 8)
-                        b3 = 1
-    if b1 == 0 and b2 == 0 and b3 == 0 and b4 == 0 and b5 == 0:
+                if not mb5.enabled:
+                    mb5.switch()
+                    mb2.switch()
+                    mb3.switch()
+    if mb1.enabled and mb2.enabled and mb3.enabled and mb4.enabled and mb5.enabled:
         Tile2('empty', 10, 5)
 
 
@@ -560,6 +358,7 @@ all_sprites = pygame.sprite.Group()
 start_screen2()
 level_map = load_level2("map2.txt")
 hero, max_x, max_y = generate_level(level_map)
+mb1, mb2, mb3, mb4, mb5 = generate_buttons(level_map)
 all_sprites.add(hero)
 hero_group.add(hero)
 
@@ -584,8 +383,9 @@ while running:
                 move2(hero, "right")
                 if map2[y][x + 1] != '#':
                     x = x + 1
-                if b1 == 0 and b2 == 0 and b3 == 0 and b4 == 0 and b5 == 0:
-                    running = False
+                if mb1.enabled and mb2.enabled and mb3.enabled and mb4.enabled and mb5.enabled:
+                    if hero.pos[0] == 9 and hero.pos[1] == 5:
+                        running = False
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
