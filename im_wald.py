@@ -93,6 +93,7 @@ class AnimatedHero(pygame.sprite.Sprite):
         self.image = self.frames[self.cur_frame]
         # self.rect = self.rect.move(x, y)
         self.move(pos_x, pos_y)
+        self.tick = 0
 
     def cut_sheet(self, sheet, columns, rows):
         self.rect = pygame.Rect(50 * self.pos[0], 50 * self.pos[1], sheet.get_width() // columns,
@@ -104,8 +105,10 @@ class AnimatedHero(pygame.sprite.Sprite):
                     frame_location, self.rect.size)))
 
     def update(self):
-        self.cur_frame = (self.cur_frame + 1) % len(self.frames)
-        self.image = self.frames[self.cur_frame]
+        if self.tick == 0:
+            self.cur_frame = (self.cur_frame + 1) % len(self.frames)
+            self.image = self.frames[self.cur_frame]
+        self.tick = (self.tick + 1) % 30
 
     def move(self, pos_x, pos_y):
         self.pos = (pos_x, pos_y)

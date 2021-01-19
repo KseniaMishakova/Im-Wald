@@ -46,21 +46,21 @@ hero_group = SpriteGroup2()
 
 
 # Генерация первого уровня
-def generate_level(level, sprite_group):
+def generate_level(level, m_group, p_group, a_group):
     new_player, x, y = None, None, None
     for y in range(len(level)):
         for x in range(len(level[y])):
             if level[y][x] == '.':
-                Tile(tile_images['empty'], tile_size, x, y, sprite_group)
+                Tile(tile_images['empty'], tile_size, x, y, m_group, a_group)
             elif level[y][x] == '#':
-                Tile(tile_images['wall'], tile_size, x, y, sprite_group)
+                Tile(tile_images['wall'], tile_size, x, y, m_group, a_group)
             elif level[y][x] == '@':
-                Tile(tile_images['empty'], tile_size, x, y, sprite_group)
-                new_player = AnimatedHero(load_image2("dude_4.png"), tile_size, 4, 1, x, y, all_sprites)
+                Tile(tile_images['empty'], tile_size, x, y, m_group, a_group)
+                new_player = AnimatedHero(load_image2("dude_4.png"), tile_size, 4, 1, x, y, p_group, a_group)
                 level[y][x] = '.'
             elif level[y][x] == '$':
-                Tile(tile_images['empty'], tile_size, x, y, sprite_group)
-                Tile(tile_images['bro'], tile_size, x, y, sprite_group)
+                Tile(tile_images['empty'], tile_size, x, y, m_group, a_group)
+                Tile(tile_images['bro'], tile_size, x, y, m_group, a_group)
                 level[y][x] = '.'
     return new_player, x, y
 
@@ -129,8 +129,6 @@ def move_hero(hero, level_map, movement, sprite_group):
             mb5.switch()
             mb2.switch()
             mb3.switch()
-    if mb1.enabled and mb2.enabled and mb3.enabled and mb4.enabled and mb5.enabled:
-        Tile(tile_images['empty'], tile_size, 10, 5, sprite_group)
 
 
 # map2 = ['###########',
@@ -183,10 +181,10 @@ clock = pygame.time.Clock()
 running = True
 i = 0
 map_level_1 = load_level2("map2.txt")
-player, max_x, max_y = generate_level(map_level_1, map_group)
+player, max_x, max_y = generate_level(map_level_1, map_group, hero_group, all_sprites)
 mb1, mb2, mb3, mb4, mb5 = generate_buttons(map_level_1, map_group)
-all_sprites.add(player)
-hero_group.add(player)
+# all_sprites.add(player)
+# hero_group.add(player)
 
 while running:
     for event in pygame.event.get():
@@ -205,13 +203,16 @@ while running:
             elif event.key == pygame.K_RIGHT:
                 move_hero(player, map_level_1, "right", map_group)
             if mb1.enabled and mb2.enabled and mb3.enabled and mb4.enabled and mb5.enabled:
+                Tile(tile_images['empty'], tile_size, 10, 5, map_group)
+            if mb1.enabled and mb2.enabled and mb3.enabled and mb4.enabled and mb5.enabled:
                 if player.pos[0] == 9 and player.pos[1] == 5:
                     running = False
 
-    all_sprites.draw(screen)
-    if i % 40 == 0:
-        player.update()
-    i += 1
+    # all_sprites.draw(screen)
+    all_sprites.update()
+    # if i % 40 == 0:
+    #     player.update()
+    # i += 1
     screen.fill(pygame.Color("black"))
     map_group.draw(screen)
     hero_group.draw(screen)
@@ -226,24 +227,6 @@ if start_screen(screen, FPS, clock,
                  "Думаю, я иду в правильном направлении."],
                 tile_fones['fon4'], 'black') == 1:
     terminate()
-
-pygame.key.set_repeat(200, 70)
-
-FPS = 60
-WIDTH = 550
-HEIGHT = 550
-STEP = 10
-
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-clock = pygame.time.Clock()
-
-player = None
-all_sprites = pygame.sprite.Group()
-tiles_group = pygame.sprite.Group()
-player_group = pygame.sprite.Group()
-player_image = load_image2('dude_4.png')
-
-tile_width = tile_height = 50
 
 
 # Камера
@@ -277,6 +260,23 @@ class Camera:
         self.dy = -(target.rect.y + target.rect.h // 2 - HEIGHT // 2)
 
 
+pygame.key.set_repeat(200, 70)
+
+FPS = 60
+WIDTH = 550
+HEIGHT = 550
+STEP = 10
+
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+clock = pygame.time.Clock()
+
+player, all_sprites, tiles_group, player_group = None, None, None, None
+all_sprites = pygame.sprite.Group()
+tiles_group = pygame.sprite.Group()
+player_group = pygame.sprite.Group()
+player_image = load_image2('dude_4.png')
+
+tile_width = tile_height = 50
 clock = pygame.time.Clock()
 running = True
 i = 0
@@ -298,10 +298,10 @@ if start_screen(screen, FPS, clock,
     terminate()
 
 map_level_2 = load_level2('map3.txt')
-player, level_x, level_y = generate_level(map_level_2, tiles_group)
+player, level_x, level_y = generate_level(map_level_2, tiles_group, player_group, all_sprites)
 camera = Camera((level_x, level_y))
-all_sprites.add(player)
-player_group.add(player)
+# all_sprites.add(player)
+# player_group.add(player)
 
 running = True
 x = 3
@@ -333,9 +333,10 @@ while running:
     screen.fill(pygame.Color(0, 0, 0))
     tiles_group.draw(screen)
     player_group.draw(screen)
-    if i % 40 == 0:
-        player.update()
-    i += 1
+    player_group.update()
+    # if i % 40 == 0:
+    #     player.update()
+    # i += 1
     pygame.display.flip()
 
     clock.tick(FPS)
