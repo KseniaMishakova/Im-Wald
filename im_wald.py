@@ -1,26 +1,17 @@
 import pygame
+from levels import load_level2
 
 
-# todo ненужный классы?
-# class Player2(Sprite2):
-#     def __init__(self, pos_x, pos_y):
-#         super().__init__(hero_group)
-#         self.image = player_image
-#         self.rect = self.image.get_rect().move(
-#             tile_width * pos_x + 15, tile_height * pos_y + 5)
-#         self.pos = (pos_x, pos_y)
-#
-#     def move(self, x, y):
-#         self.pos = (x, y)
-#         self.rect = self.image.get_rect().move(
-#             tile_width * self.pos[0] + 15, tile_height * self.pos[1] + 5)
+class LevelMap:
+    def __init__(self, file_name):
+        self.map = load_level2(file_name)
 
-# class ScreenFrame2(pygame.sprite.Sprite):  # Размер окна
-#
-#     def __init__(self):
-#         super().__init__()
-#         self.rect = (0, 0, 500, 500)
-#
+    # Обратите внимание развернули координаты в более привычный на математике вид
+    def get_cell(self, x, y):
+        return self.map[y][x]
+
+    def is_passage(self, x, y):
+        return self.get_cell(x, y) != '#'
 
 
 class SpriteGroup2(pygame.sprite.Group):
@@ -88,12 +79,19 @@ class AnimatedHero(pygame.sprite.Sprite):
         self.frames = []
         self.tile_size = tile_size
         self.pos = (pos_x, pos_y)
+        self.x = pos_x
+        self.y = pos_y
         self.cut_sheet(sheet, columns, rows)
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
         # self.rect = self.rect.move(x, y)
         self.move(pos_x, pos_y)
         self.tick = 0
+
+    def set_pos(self, x, y):
+        self.pos = (x, y)
+        self.x = x
+        self.y = y
 
     def cut_sheet(self, sheet, columns, rows):
         self.rect = pygame.Rect(50 * self.pos[0], 50 * self.pos[1], sheet.get_width() // columns,
@@ -111,7 +109,7 @@ class AnimatedHero(pygame.sprite.Sprite):
         self.tick = (self.tick + 1) % 30
 
     def move(self, pos_x, pos_y):
-        self.pos = (pos_x, pos_y)
+        self.set_pos(pos_x, pos_y)
         self.rect = self.rect.move(self.tile_size[0] * self.pos[0] + 15, self.tile_size[1] * self.pos[1] + 5)
         self.rect = self.image.get_rect().move(
             self.tile_size[0] * self.pos[0] + 15, self.tile_size[1] * self.pos[1] + 5)

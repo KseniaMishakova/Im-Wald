@@ -2,7 +2,7 @@ import pygame
 import os
 import sys
 from levels import start_screen, load_image2, load_level, load_level2
-from im_wald import SpriteGroup2, MagicButton, AnimatedHero, Tile
+from im_wald import SpriteGroup2, MagicButton, AnimatedHero, Tile, LevelMap
 
 
 def terminate():
@@ -183,8 +183,7 @@ i = 0
 map_level_1 = load_level2("map2.txt")
 player, max_x, max_y = generate_level(map_level_1, map_group, hero_group, all_sprites)
 mb1, mb2, mb3, mb4, mb5 = generate_buttons(map_level_1, map_group)
-# all_sprites.add(player)
-# hero_group.add(player)
+
 
 while running:
     for event in pygame.event.get():
@@ -210,9 +209,6 @@ while running:
 
     # all_sprites.draw(screen)
     all_sprites.update()
-    # if i % 40 == 0:
-    #     player.update()
-    # i += 1
     screen.fill(pygame.Color("black"))
     map_group.draw(screen)
     hero_group.draw(screen)
@@ -297,11 +293,9 @@ if start_screen(screen, FPS, clock,
                 tile_fones['fon5'], 'black') == 1:
     terminate()
 
-map_level_2 = load_level2('map3.txt')
-player, level_x, level_y = generate_level(map_level_2, tiles_group, player_group, all_sprites)
+map_level_2 = LevelMap('map3.txt')
+player, level_x, level_y = generate_level(map_level_2.map, tiles_group, player_group, all_sprites)
 camera = Camera((level_x, level_y))
-# all_sprites.add(player)
-# player_group.add(player)
 
 running = True
 x = 3
@@ -315,14 +309,29 @@ while running:
             terminate()  # принудительно закрываем приложение, чтобы не смотреть на следующие экраны
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                move_hero(player, map_level_2, "left", tiles_group)
+                if map_level_2.is_passage(x - 1, y):
+                # if map_level_2_1.is_passage(player.x - 1, player.y):
+                #     player.move(player.x - 1, player.y)
+                    player.rect.x -= 50
+                    x = x - 1
             elif event.key == pygame.K_RIGHT:
-                move_hero(player, map_level_2, "right", tiles_group)
+                if map_level_2.is_passage(x + 1, y):
+                # if map_level_2_1.is_passage(player.x + 1, player.y):
+                #     player.move(player.x + 1, player.y)
+                    player.rect.x += 50
+                    x = x + 1
             elif event.key == pygame.K_UP:
-                move_hero(player, map_level_2, "up", tiles_group)
-            if event.key == pygame.K_DOWN:
-                move_hero(player, map_level_2, "down", tiles_group)
-            if player.pos[0] == 17 and player.pos[1] == 4:
+                if map_level_2.is_passage(x, y - 1):
+                    # player.move(player.pos[0], player.pos[1] - 1)
+                    player.rect.y -= 50
+                    y = y - 1
+            elif event.key == pygame.K_DOWN:
+                if map_level_2.is_passage(x, y + 1):
+                    # player.move(player.pos[0] - 1, player.pos[1])
+                    player.rect.y += 50
+                    y = y + 1
+            # if player.x == 17 and player.y == 4:
+            if x == 17 and y == 4:
                 running = False
 
     camera.update(player)
@@ -334,9 +343,6 @@ while running:
     tiles_group.draw(screen)
     player_group.draw(screen)
     player_group.update()
-    # if i % 40 == 0:
-    #     player.update()
-    # i += 1
     pygame.display.flip()
 
     clock.tick(FPS)
